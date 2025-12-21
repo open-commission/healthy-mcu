@@ -47,7 +47,7 @@ esp_err_t gpio_init(gpio_num_t gpio_num, gpio_mode_t mode)
  * @param level 电平状态（0或1）
  * @return esp_err_t ESP-IDF错误码
  */
-esp_err_t gpio_set_level(gpio_num_t gpio_num, uint32_t level)
+esp_err_t gpio_set_level_safe(gpio_num_t gpio_num, uint32_t level)
 {
     // 检查GPIO编号是否有效
     if (gpio_num < 0 || gpio_num >= GPIO_NUM_MAX) {
@@ -72,7 +72,7 @@ esp_err_t gpio_set_level(gpio_num_t gpio_num, uint32_t level)
  * @param gpio_num GPIO编号
  * @return int 电平状态（0或1）
  */
-int gpio_get_level(gpio_num_t gpio_num)
+int gpio_get_level_safe(gpio_num_t gpio_num)
 {
     // 检查GPIO编号是否有效
     if (gpio_num < 0 || gpio_num >= GPIO_NUM_MAX) {
@@ -101,7 +101,7 @@ int gpio_toggle_level(gpio_num_t gpio_num)
     }
 
     // 读取当前电平状态
-    int current_level = gpio_get_level(gpio_num);
+    int current_level = gpio_get_level_safe(gpio_num);
     if (current_level < 0) {
         ESP_LOGE(TAG, "Failed to read GPIO %d level", gpio_num);
         return -1;
@@ -109,7 +109,7 @@ int gpio_toggle_level(gpio_num_t gpio_num)
 
     // 切换电平状态
     int new_level = !current_level;
-    esp_err_t err = gpio_set_level(gpio_num, new_level);
+    esp_err_t err = gpio_set_level_safe(gpio_num, new_level);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "Failed to toggle GPIO %d level", gpio_num);
         return -1;
