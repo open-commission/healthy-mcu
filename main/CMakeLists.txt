@@ -1,5 +1,10 @@
 idf_component_register(
-        SRCS "healthy-mcu.c" "adc/adc.c" "gpio/gpio.c" "gpio/pwm.c" "uart/uart.c" "sppbt/spp_client.c" "sc/sr04.c"
-        INCLUDE_DIRS "." "adc" "gpio" "uart" "sppbt" "sc"
-        PRIV_REQUIRES bt esp_adc esp_driver_uart esp_driver_gpio nvs_flash esp_driver_ledc
+        SRCS "healthy-mcu.c" "adc/adc.c" "gpio/gpio.c" "gpio/pwm.c"
+        "uart/uart.c" "sppbt/spp_client.c" "sc/sr04.c"
+        "max/algorithm.c" "max/blood.c" "max/max30102.c" "max/myi2c.c"
+
+        INCLUDE_DIRS "." "adc" "gpio" "uart" "sppbt" "sc" "max"
+
+        PRIV_REQUIRES bt esp_adc esp_driver_uart esp_driver_gpio esp_driver_i2c
+        nvs_flash esp_driver_ledc
 )

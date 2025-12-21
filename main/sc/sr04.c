@@ -15,8 +15,8 @@
 // -------------------------
 // 引脚定义
 // -------------------------
-#define TRIG_GPIO 5
-#define ECHO_GPIO 4
+#define TRIG_GPIO 6
+#define ECHO_GPIO 7
 
 // -------------------------
 // 超声测距超时时间(us)
