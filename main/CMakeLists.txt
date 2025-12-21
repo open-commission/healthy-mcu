@@ -1,4 +1,4 @@
-idf_component_register(SRCS "healthy-mcu.c" "adc/adc.c" "gpio/gpio.c" "gpio/pwm.c" "uart/uart.c"
-        INCLUDE_DIRS "." "adc" "gpio" "uart"
-        PRIV_REQUIRES esp_adc esp_driver_uart esp_driver_gpio
+idf_component_register(SRCS "healthy-mcu.c" "adc/adc.c" "gpio/gpio.c" "gpio/pwm.c" "uart/uart.c" "sppbt/spp_client.c"
+        INCLUDE_DIRS "." "adc" "gpio" "uart" "sppbt"
+        PRIV_REQUIRES bt esp_adc esp_driver_uart esp_driver_gpio nvs_flash esp_driver_ledc
 )
