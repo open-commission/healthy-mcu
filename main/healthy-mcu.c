@@ -4,6 +4,7 @@
 #include "myi2c.h"
 #include "uart.h"
 #include "sc/sr04.h"
+#include "gpio/gpio.h"
 
 // 定义UART接收回调函数
 static void uart_receive_callback(const uint8_t* data, size_t length)
@@ -13,7 +14,8 @@ static void uart_receive_callback(const uint8_t* data, size_t length)
 
 void uart_start(void* arg)
 {
-    while(1) {
+    while (1)
+    {
         uart_send_data(UART_NUM_1, (const uint8_t*)"Hello World!\n", 13);
         // 延迟三秒
         vTaskDelay(3000 / portTICK_PERIOD_MS);
@@ -23,8 +25,9 @@ void uart_start(void* arg)
 
 max30102_handle_t max30102;
 float temp, spo2, heart;
-static const char *TAG = "main";
-void max30102_task(void *p)
+static const char* TAG = "main";
+
+void max30102_task(void* p)
 {
     while (1)
     {
@@ -52,4 +55,14 @@ void app_main(void)
     max30102_config(max30102);
 
     xTaskCreate(max30102_task, "max30102", 4096, NULL, 6, NULL);
+
+    // gpio_init(GPIO_NUM_12, GPIO_MODE_OUTPUT);
+    //
+    // while (1)
+    // {
+    //     gpio_set_level_safe(GPIO_NUM_12, 1);
+    //     vTaskDelay(1000 / portTICK_PERIOD_MS);
+    //     gpio_set_level_safe(GPIO_NUM_12, 0);
+    //     vTaskDelay(1000 / portTICK_PERIOD_MS);
+    // }
 }
