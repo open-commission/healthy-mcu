@@ -1,3 +1,4 @@
+#include "710b.h"
 #include "blood.h"
 #include "esp_log.h"
 #include "max30102.h"
@@ -40,6 +41,11 @@ void max30102_task(void* p)
     }
 }
 
+hx710b_t hx710b = {
+    .sck_pin = GPIO_NUM_8,
+    .dout_pin = GPIO_NUM_9
+};
+
 void app_main(void)
 {
     // uart_init(UART_NUM_1, GPIO_NUM_0, GPIO_NUM_1, 115200, uart_receive_callback);
@@ -49,12 +55,12 @@ void app_main(void)
     //
     // vTaskDelete(NULL);
 
-    ESP_ERROR_CHECK(i2c_master_init());
-
-    max30102 = max30102_create(g_i2c_bus, MAX30102_Device_address, GPIO_NUM_6);
-    max30102_config(max30102);
-
-    xTaskCreate(max30102_task, "max30102", 4096, NULL, 6, NULL);
+    // ESP_ERROR_CHECK(i2c_master_init());
+    //
+    // max30102 = max30102_create(g_i2c_bus, MAX30102_Device_address, GPIO_NUM_6);
+    // max30102_config(max30102);
+    //
+    // xTaskCreate(max30102_task, "max30102", 4096, NULL, 6, NULL);
 
     // gpio_init(GPIO_NUM_12, GPIO_MODE_OUTPUT);
     //
@@ -65,4 +71,12 @@ void app_main(void)
     //     gpio_set_level_safe(GPIO_NUM_12, 0);
     //     vTaskDelay(1000 / portTICK_PERIOD_MS);
     // }
+
+    hx710b_init(&hx710b);
+
+    while (1) {
+        int32_t raw = hx710b_read(&hx710b);
+        ESP_LOGI("HX710B", "RAW: %ld", raw);
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
 }
