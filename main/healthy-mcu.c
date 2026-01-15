@@ -48,29 +48,29 @@ hx710b_t hx710b = {
 
 void app_main(void)
 {
-    // uart_init(UART_NUM_1, GPIO_NUM_0, GPIO_NUM_1, 115200, uart_receive_callback);
-    //
-    // xTaskCreate(sr04_start, "sr04_task", 2048, NULL, 5, NULL);
-    // xTaskCreate(uart_start, "uart_task", 2048, NULL, 5, NULL);
-    //
-    // vTaskDelete(NULL);
+    uart_init(UART_NUM_1, GPIO_NUM_0, GPIO_NUM_1, 115200, uart_receive_callback);
 
-    // ESP_ERROR_CHECK(i2c_master_init());
-    //
-    // max30102 = max30102_create(g_i2c_bus, MAX30102_Device_address, GPIO_NUM_6);
-    // max30102_config(max30102);
-    //
-    // xTaskCreate(max30102_task, "max30102", 4096, NULL, 6, NULL);
+    xTaskCreate(sr04_start, "sr04_task", 2048, NULL, 5, NULL);
+    xTaskCreate(uart_start, "uart_task", 2048, NULL, 5, NULL);
 
-    // gpio_init(GPIO_NUM_12, GPIO_MODE_OUTPUT);
-    //
-    // while (1)
-    // {
-    //     gpio_set_level_safe(GPIO_NUM_12, 1);
-    //     vTaskDelay(1000 / portTICK_PERIOD_MS);
-    //     gpio_set_level_safe(GPIO_NUM_12, 0);
-    //     vTaskDelay(1000 / portTICK_PERIOD_MS);
-    // }
+    vTaskDelete(NULL);
+
+    ESP_ERROR_CHECK(i2c_master_init());
+
+    max30102 = max30102_create(g_i2c_bus, MAX30102_Device_address, GPIO_NUM_6);
+    max30102_config(max30102);
+
+    xTaskCreate(max30102_task, "max30102", 4096, NULL, 6, NULL);
+
+    gpio_init(GPIO_NUM_12, GPIO_MODE_OUTPUT);
+
+    while (1)
+    {
+        gpio_set_level_safe(GPIO_NUM_12, 1);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        gpio_set_level_safe(GPIO_NUM_12, 0);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
 
     hx710b_init(&hx710b);
 
@@ -78,5 +78,6 @@ void app_main(void)
         int32_t raw = hx710b_read(&hx710b);
         ESP_LOGI("HX710B", "RAW: %ld", raw);
         vTaskDelay(pdMS_TO_TICKS(500));
+
     }
 }
