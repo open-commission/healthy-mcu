@@ -4,34 +4,55 @@
 
 #ifndef HEALTHY_MCU_VARS_H
 #define HEALTHY_MCU_VARS_H
-#include <stdbool.h>
 #include <stdint.h>
 
+#include "cbor.h"
 
 typedef enum
 {
-    VAL_TYPE_INT,
-    VAL_TYPE_FLOAT,
-    VAL_TYPE_BOOL,
-    VAL_TYPE_STR
+    VAL_TYPE_INT = 0,
+    VAL_TYPE_FLOAT = 1,
+    VAL_TYPE_BOOL = 2,
+    VAL_TYPE_STR = 3,
+    VAL_TYPE_BYTE = 4
 } val_type_t;
+
+typedef enum
+{
+    CANNEL_PROPERTY = 0,
+    CANNEL_EVENT = 1,
+    CANNEL_FUNCTION = 2,
+    CANNEL_COMMAND = 3,
+    CANNEL_CONFIG = 4,
+} cannel_type_t;
 
 typedef struct
 {
     char device_id[18];
     char key[14];
-
-    union
-    {
-        int32_t i_val;
-        float f_val;
-        bool b_val;
-        char str_val[32];
-    } value;
-
+    void* value;
     val_type_t type;
+    cannel_type_t channel;
     uint32_t timestamp;
-    int8_t channel;
-} sensor_data_t;
+} iot_data_t;
+
+
+typedef struct
+{
+    float tiwen_var;
+    float xinlv_var;
+    float xveyang_var;
+    float tizhong_var;
+    float xveya_var;
+    float shengao_var;
+    int lvdeng_status;
+    int hongdeng_status;
+    int fengmingqi_status;
+} global_data;
+
+extern global_data data;
+
+size_t iot_data_encode_cbor(const iot_data_t* data, uint8_t* buffer, size_t buffer_size);
+CborError iot_data_decode_cbor(const uint8_t* buffer, size_t len, iot_data_t* out_data);
 
 #endif //HEALTHY_MCU_VARS_H

@@ -83,24 +83,3 @@ void sr04_gpio_set(void)
     gpio_reset_pin(ECHO_GPIO);
     gpio_set_direction(ECHO_GPIO, GPIO_MODE_INPUT);
 }
-
-// -------------------------
-// 主程序
-// -------------------------
-void sr04_start(void* pvParameters){
-    // 初始化 GPIO
-    sr04_gpio_set();
-
-    // v5 不需要手动 esp_timer_init()
-
-    while (1)
-    {
-        float distance = get_distance_cm();
-        if (distance > 0)
-            printf("距离: %.2f cm\n", distance);
-        else
-            printf("测距失败或超出范围\n");
-
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-}
