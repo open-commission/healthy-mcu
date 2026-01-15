@@ -5,6 +5,23 @@
 #include "vars.h"
 #include "cbor.h"
 
+volatile global_data data = {
+    .tiwen_var = 0,
+    .xinlv_var = 0,
+    .xveyang_var = 0,
+    .tizhong_var = 0,
+    .xveya_var = 0,
+    .shengao_var = 0,
+    .lvdeng_status = 0,
+    .hongdeng_status = 0,
+    .fengmingqi_status = 0,
+    .shengao_status = 0,
+    .tiwen_status = 0,
+    .tizhong_status = 0,
+    .xinlv_xveyang_status = 0,
+    .xveya_status = 0
+};
+
 /**
  * 将 iot_data_t 结构体编码为 CBOR 格式
  */

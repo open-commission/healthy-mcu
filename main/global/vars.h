@@ -40,17 +40,22 @@ typedef struct
 typedef struct
 {
     float tiwen_var;
+    int tiwen_status;
     float xinlv_var;
     float xveyang_var;
+    int xinlv_xveyang_status;
     float tizhong_var;
+    int tizhong_status;
     float xveya_var;
+    int xveya_status;
     float shengao_var;
+    int shengao_status;
     int lvdeng_status;
     int hongdeng_status;
     int fengmingqi_status;
 } global_data;
 
-extern global_data data;
+extern volatile global_data data;
 
 size_t iot_data_encode_cbor(const iot_data_t* data, uint8_t* buffer, size_t buffer_size);
 CborError iot_data_decode_cbor(const uint8_t* buffer, size_t len, iot_data_t* out_data);

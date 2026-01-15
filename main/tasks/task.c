@@ -6,6 +6,7 @@
 #include "task.h"
 
 #include "710b.h"
+#include "711.h"
 #include "blood.h"
 #include "esp_err.h"
 #include "esp_log.h"
@@ -17,42 +18,46 @@
 #include "vars.h"
 #include "freertos/FreeRTOS.h"
 
-max30102_handle_t max30102;
-float temp, spo2, heart;
-
 void max30102_task(void* p)
 {
+    float temp, spo2, heart;
+
     ESP_ERROR_CHECK(i2c_master_init());
 
-    max30102 = max30102_create(g_i2c_bus, MAX30102_Device_address, GPIO_NUM_6);
+    max30102_handle_t max30102 = max30102_create(g_i2c_bus, MAX30102_Device_address, GPIO_NUM_6);
     max30102_config(max30102);
 
     while (1)
     {
-        ESP_ERROR_CHECK(max30102_read_temp(max30102, &temp));
-        ESP_LOGI("MAX30102", "temp:%f", temp);
-        temp = 0.0;
-        blood_Loop(max30102, &heart, &spo2);
-        ESP_LOGI("max30102", "SPO2:%.2f,HEART:%.2f", spo2, heart);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        if (data.xinlv_xveyang_status == 1)
+        {
+            ESP_ERROR_CHECK(max30102_read_temp(max30102, &temp));
+            ESP_LOGI("MAX30102", "temp:%f", temp);
+            temp = 0.0;
+            blood_Loop(max30102, &heart, &spo2);
+            ESP_LOGI("max30102", "SPO2:%.2f,HEART:%.2f", spo2, heart);
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
-
-hx710b_t hx710b = {
-    .sck_pin = GPIO_NUM_8,
-    .dout_pin = GPIO_NUM_9
-};
-
 void hx710b_task(void* p)
 {
+    hx710b_t hx710b = {
+        .sck_pin = GPIO_NUM_8,
+        .dout_pin = GPIO_NUM_9
+    };
+
     hx710b_init(&hx710b);
 
     while (1)
     {
-        int32_t raw = hx710b_read(&hx710b);
-        ESP_LOGI("HX710B", "RAW: %ld", raw);
-        vTaskDelay(pdMS_TO_TICKS(500));
+        if (data.xveya_status == 1)
+        {
+            int32_t raw = hx710b_read(&hx710b);
+            ESP_LOGI("HX710B", "RAW: %ld", raw);
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
@@ -64,12 +69,28 @@ void sr04_task(void* p)
     // v5 不需要手动 esp_timer_init()
     while (1)
     {
-        float distance = get_distance_cm();
-        if (distance > 0)
-            printf("距离: %.2f cm\n", distance);
-        else
-            printf("测距失败或超出范围\n");
+        if (data.shengao_status == 1)
+        {
+            float distance = get_distance_cm();
+            if (distance > 0)
+                printf("距离: %.2f cm\n", distance);
+            else
+                printf("测距失败或超出范围\n");
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
 
+void hx711_task(void* p)
+{
+    HX711_init(GPIO_NUM_15, GPIO_NUM_16, eGAIN_128);
+    HX711_tare();
+
+    unsigned long weight = 0;
+    while (1)
+    {
+        weight = HX711_get_units(10);
+        ESP_LOGI("hx711", "******* weight = %ld *********\n ", weight);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
@@ -79,10 +100,33 @@ void status_task(void* p)
     gpio_init(GPIO_NUM_12, GPIO_MODE_OUTPUT);
     while (1)
     {
-        gpio_set_level_safe(GPIO_NUM_12, 1);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-        gpio_set_level_safe(GPIO_NUM_12, 0);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        if (data.lvdeng_status == 0)
+        {
+            gpio_set_level_safe(GPIO_NUM_12, 0);
+        }
+        else
+        {
+            gpio_set_level_safe(GPIO_NUM_12, 1);
+        }
+
+        if (data.hongdeng_status == 0)
+        {
+            gpio_set_level_safe(GPIO_NUM_12, 0);
+        }
+        else
+        {
+            gpio_set_level_safe(GPIO_NUM_12, 1);
+        }
+
+        if (data.fengmingqi_status == 0)
+        {
+            gpio_set_level_safe(GPIO_NUM_12, 0);
+        }
+        else
+        {
+            gpio_set_level_safe(GPIO_NUM_12, 1);
+        }
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 
@@ -132,8 +176,6 @@ void uart_task(void* p)
 
     while (1)
     {
-        uart_send_data(UART_NUM_1, (const uint8_t*)"Hello World!\n", 13);
-        // 延迟三秒
-        vTaskDelay(2 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
